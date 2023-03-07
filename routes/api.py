@@ -7,9 +7,13 @@ from flask import Blueprint
 
 from database import exec
 
-api = Blueprint("api", __name__, template_folder="api")
+api = Blueprint("api", __name__, subdomain="api")
 
-@api.route("/v1/upload", methods=["POST"], subdomain="api")
+@api.route("/", methods=["GET"])
+def index():
+	return "developer? t.me/shockpast"
+
+@api.route("/v1/upload", methods=["POST"])
 def uploadFile():
 	file = request.files.get("sharex")
 
@@ -22,7 +26,7 @@ def uploadFile():
 
 	return f"{request.host_url}f/{file.filename}"
 
-@api.route("/v1/shorten", methods=["POST"], subdomain="api")
+@api.route("/v1/shorten", methods=["POST"])
 def shortenURL():
 	full = request.form.get("url")
 	short = "".join(random.choices(string.ascii_letters + string.digits, k=6))

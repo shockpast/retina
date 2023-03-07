@@ -8,7 +8,7 @@ from database import exec, init
 app = Flask(__name__)
 app.register_blueprint(api)
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET"], subdomain="")
 def index():
 	return {
 		"technologies": {
@@ -31,4 +31,6 @@ def findURL(id):
 
 if (__name__ == "__main__"):
 	init()
+
+	app.config["SERVER_NAME"] = "localhost:5000"
 	app.run()
