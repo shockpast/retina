@@ -24,7 +24,7 @@ def uploadFile():
 
 	file.save(f"files/{file.filename}")
 
-	return f"{request.host_url}f/{file.filename}"
+	return f"{request.host_url.replace('api.', '')}f/{file.filename}"
 
 @api.route("/v1/shorten", methods=["POST"])
 def shortenURL():
@@ -38,4 +38,4 @@ def shortenURL():
 
 	exec(f"INSERT INTO shortened_urls (full, short, clicks) VALUES (?, ?, 0)", (full, short,))
 
-	return f"{request.host_url}s/{short}"
+	return f"{request.host_url.replace('api.', '')}s/{short}"
