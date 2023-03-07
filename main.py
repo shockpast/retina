@@ -3,7 +3,6 @@ from flask import send_from_directory, redirect
 
 from routes.api import api
 
-from database import cursor
 from database import exec, init
 
 app = Flask(__name__)
