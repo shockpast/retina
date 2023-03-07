@@ -1,12 +1,10 @@
-import sqlite3
-
 from flask import Flask
-from flask import send_from_directory
+from flask import send_from_directory, redirect
 
 from routes.api import api
 
-sqlite = sqlite3.connect("server.db")
-cursor = sqlite.cursor()
+from database import cursor
+from database import exec, init
 
 app = Flask(__name__)
 app.register_blueprint(api)
@@ -21,11 +19,17 @@ def index():
 		}
 	}
 
-@app.route("/f/<path:path>", methods=["GET"])
-def handle(path):
-	return send_from_directory("files", path)
+@app.route("/f/<name>", methods=["GET"])
+def findFile(name):
+	return send_from_directory("files", name)
+
+@app.route("/s/<id>", methods=["GET"])
+def findURL(id):
+	data = exec("SELECT * FROM shortened_urls WHERE short = ?", (id,)).fetchall()[0]
+	exec("UPDATE shortened_urls SET clicks = ? WHERE short = ?", (data[2] + 1, data[1]))
+
+	return redirect("http://" + data[0]) or { "statusCode": 401, "error": { "code": "@app.route(\"/s/<id:id>\", methods=[\"GET\"])" } }
 
 if (__name__ == "__main__"):
-	cursor.execute("CREATE TABLE IF NOT EXISTS shorten_url ('full' varchar, 'short' varchar, 'clicks' INTEGER)")
-
+	init()
 	app.run()

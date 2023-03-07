@@ -5,6 +5,8 @@ import string
 from flask import request
 from flask import Blueprint
 
+from database import exec
+
 api = Blueprint("api", __name__, template_folder="api")
 
 @api.route("/v1/upload", methods=["POST"])
@@ -30,4 +32,6 @@ def shortenURL():
 	if (request.form.get("token") != os.getenv("FLASK_TOKEN")):
 		return { "statusCode": 401, "error": { "code": "if (request.form.get(\"token\") != os.getenv(\"FLASK_TOKEN\")):" } }
 
-	cursor.execute(f"INSERT INTO shortened_urls (full, short, clicks) VALUES ({full}, {short}, 0)")
+	exec(f"INSERT INTO shortened_urls (full, short, clicks) VALUES (?, ?, 0)", (full, short,))
+
+	return f"{request.host_url}s/{short}"
