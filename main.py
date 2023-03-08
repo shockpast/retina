@@ -3,7 +3,8 @@ from flask import send_from_directory, redirect
 
 from routes.api import api
 
-from database import exec, init
+from database import cursor
+from database import init
 
 app = Flask(__name__)
 app.register_blueprint(api)
@@ -24,10 +25,12 @@ def findFile(name):
 
 @app.route("/s/<id>", methods=["GET"])
 def findURL(id):
-	data = exec("SELECT * FROM shortened_urls WHERE short = ?", (id,)).fetchall()[0]
-	exec("UPDATE shortened_urls SET clicks = ? WHERE short = ?", (data[2] + 1, data[1]))
+	data = cursor.execute("SELECT * FROM shortened_urls WHERE short = ?", (id,)).fetchall()
 
-	return redirect("http://" + data[0]) or { "statusCode": 401, "error": { "code": "@app.route(\"/s/<id:id>\", methods=[\"GET\"])" } }
+	if (not data):
+		return f"ERROR: {id} doesn't exist in DB."
+
+	return redirect(data[0][0] if ("https://" in data[0][0] or "http://" in data[0][0]) else f"http://{data[0][0]}")
 
 if (__name__ == "__main__"):
 	init()
