@@ -1,5 +1,8 @@
 from flask import Flask
-from flask import send_from_directory, render_template, redirect
+from flask import send_from_directory, redirect
+
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from routes.api import api
 
@@ -7,6 +10,9 @@ from database import cursor
 from database import init
 
 app = Flask(__name__)
+limiter = Limiter(get_remote_address, app = app, storage_uri = "memory://")
+
+limiter.limit("40/minute")(api)
 app.register_blueprint(api)
 
 @app.route("/", methods=["GET"])
