@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import send_from_directory, redirect
+from flask import send_from_directory, render_template, redirect
 
 from routes.api import api
 
@@ -11,13 +11,7 @@ app.register_blueprint(api)
 
 @app.route("/", methods=["GET"])
 def index():
-	return {
-		"technologies": {
-			"os": "windows 11",
-			"editor": "visual studio code",
-			"shell": "powershell"
-		}
-	}
+	return "Hello World from <a href='https://github.com/shockpast/retina'>Retina</a>!"
 
 @app.route("/f/<name>", methods=["GET"])
 def findFile(name):

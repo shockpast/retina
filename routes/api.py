@@ -13,7 +13,7 @@ api = Blueprint("api", __name__, subdomain="api")
 
 @api.route("/", methods=["GET"])
 def index():
-	return "developer? t.me/shockpast"
+	return "💻"
 
 @api.route("/v1/upload", methods=["POST"])
 def uploadFile():
