@@ -9,7 +9,7 @@ from database import init
 app = Flask(__name__)
 app.register_blueprint(api)
 
-@app.route("/", methods=["GET"], subdomain="")
+@app.route("/", methods=["GET"])
 def index():
 	return {
 		"technologies": {

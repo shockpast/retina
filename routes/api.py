@@ -2,6 +2,8 @@ import os
 import random
 import string
 
+from markupsafe import escape
+
 from flask import request
 from flask import Blueprint
 
@@ -16,15 +18,18 @@ def index():
 @api.route("/v1/upload", methods=["POST"])
 def uploadFile():
 	file = request.files.get("sharex")
+	name = escape(file.filename)
 
 	if (not file):
 		return { "statusCode": 400, "error": { "code": "if (not file):" } }
 	if (request.form.get("token") != os.getenv("FLASK_TOKEN")):
 		return { "statusCode": 401, "error": { "code": "if (request.form.get(\"token\") != os.getenv(\"FLASK_TOKEN\")):" } }
+	if (not os.access("files/", os.F_OK)):
+		os.mkdir("files/")
 
-	file.save(f"files/{file.filename}")
+	file.save(f"files/{name}")
 
-	return f"{request.host_url.replace('api.', '')}f/{file.filename}"
+	return f"{request.host_url.replace('api.', '')}f/{name}"
 
 @api.route("/v1/shorten", methods=["POST"])
 def shortenURL():
