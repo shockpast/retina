@@ -18,15 +18,20 @@ def index():
 @api.route("/v1/upload", methods=["POST"])
 def uploadFile():
 	file = request.files.get("sharex")
-	name = escape(file.filename)
 
-	if (not file):
-		return "ERROR: 'file' field in body is corrupted or doesn't exist."
+	name = escape(file.filename)
+	size = file.stream.seek(0, os.SEEK_END)
+
 	if (request.form.get("token") != os.getenv("FLASK_TOKEN")):
 		return "ERROR: 'token' is incorrect."
+	if (not file):
+		return "ERROR: 'file' field in body is corrupted or doesn't exist."
+	if (size >= 1e+8):
+		return "ERROR: size of the file is too big (>100mb)"
 	if (not os.access("files/", os.F_OK)):
 		os.mkdir("files/")
 
+	file.stream.seek(0, os.SEEK_SET)
 	file.save(f"files/{name}")
 
 	return f"{request.host_url.replace('api.', '')}f/{name}"
