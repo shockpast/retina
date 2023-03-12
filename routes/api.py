@@ -7,6 +7,7 @@ from markupsafe import escape
 from flask import request
 from flask import Blueprint
 
+from utils import clear_exif
 from database import exec
 
 api = Blueprint("api", __name__, subdomain="api")
@@ -33,6 +34,8 @@ def uploadFile():
 
 	file.stream.seek(0, os.SEEK_SET)
 	file.save(f"files/{name}")
+
+	clear_exif(image=name, dir="files")
 
 	return f"{request.host_url.replace('api.', '')}f/{name}"
 
