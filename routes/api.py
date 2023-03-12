@@ -45,10 +45,10 @@ def shortenURL():
 	full = request.form.get("url")
 	short = "".join(random.choices(string.ascii_letters + string.digits, k=6))
 
-	if (not full):
-		return "ERROR: 'full' field in body is pointing not to a link or doesn't exist."
 	if (request.form.get("token") != os.getenv("FLASK_TOKEN")):
 		return "ERROR: 'token' is incorrect."
+	if (not full):
+		return "ERROR: 'full' field in body is pointing not to a link or doesn't exist."
 
 	exec(f"INSERT INTO shortened_urls (full, short, clicks) VALUES (?, ?, 0)", (full, short,))
 
