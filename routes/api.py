@@ -2,12 +2,13 @@ import os
 import random
 import string
 
-from markupsafe import escape
+from werkzeug.utils import secure_filename
 
 from flask import request
 from flask import Blueprint
 
-from utils import clear_exif
+from utils.image import clear_exif
+
 from database import exec
 
 api = Blueprint("api", __name__, subdomain="api")
@@ -20,7 +21,7 @@ def index():
 def uploadFile():
 	file = request.files.get("sharex")
 
-	name = escape(file.filename)
+	name = secure_filename(file.filename)
 	size = file.stream.seek(0, os.SEEK_END)
 
 	if (request.form.get("token") != os.getenv("FLASK_TOKEN")):
@@ -30,12 +31,12 @@ def uploadFile():
 	if (size >= 1e+8):
 		return "ERROR: size of the file is too big (>100mb)"
 	if (not os.access("files/", os.F_OK)):
-		os.mkdir("files/")
+		os.mkdir(f"files/")
 
 	file.stream.seek(0, os.SEEK_SET)
 	file.save(f"files/{name}")
 
-	clear_exif(image=name, dir="files")
+	clear_exif(name, "files")
 
 	return f"{request.host_url.replace('api.', '')}f/{name}"
 
