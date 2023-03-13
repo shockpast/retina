@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from flask import request
 from flask import Blueprint
 
-from utils.image import clear_exif
+from utils.image import clear_exif, get_size
 
 from database import exec
 
@@ -22,7 +22,7 @@ def uploadFile():
 	file = request.files.get("sharex")
 
 	name = secure_filename(file.filename)
-	size = file.stream.seek(0, os.SEEK_END)
+	size = get_size(file)
 
 	if (request.form.get("token") != os.getenv("FLASK_TOKEN")):
 		return "ERROR: 'token' is incorrect."
@@ -33,7 +33,6 @@ def uploadFile():
 	if (not os.access("files/", os.F_OK)):
 		os.mkdir(f"files/")
 
-	file.stream.seek(0, os.SEEK_SET)
 	file.save(f"files/{name}")
 
 	clear_exif(name, "files")
